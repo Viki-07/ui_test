@@ -6,6 +6,11 @@ import 'package:ui_test/Hub_Screen.dart';
 import 'package:ui_test/Learn_Screen.dart';
 import 'package:ui_test/Profile_Screen.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:ui_test/httpclients/lesson_client.dart';
+import 'package:ui_test/models/Lesson_Model.dart';
+import 'package:ui_test/models/Program_Model.dart';
+import 'httpclients/program_client.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -18,15 +23,35 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-    List<Widget> builScreen() {
+  ProgramApi? programData;
+  LessonApi? lessonData;
+  var isLoaded = false;
+  void initState() {
+    super.initState();
+    getData();
+  }
+
+  getData() async {
+    programData = await ProgramClient().getPrograms();
+    lessonData = await LessonClient().getLessons();
+
+    if (programData != null && lessonData != null) {
+      setState(() {
+        isLoaded = true;
+      });
+    }
+  }
+
+  List<Widget> builScreen() {
     return [
-      HomeScreen(),
-      Learn_Screen(),
-      Hub_Screen(),
-      Chat_Screen(),
-      Profile_Screen(),
+      HomeScreen(programData: programData!, lessonData: lessonData!),
+      const Learn_Screen(),
+      const Hub_Screen(),
+      const Chat_Screen(),
+      const Profile_Screen(),
     ];
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -54,44 +79,45 @@ class _MyAppState extends State<MyApp> {
                 color: Colors.grey,
               ))
         ], backgroundColor: const Color(0xFFEEF3FD), elevation: 0),
-        body: 
-        PersistentTabView(
-          navBarStyle: NavBarStyle.simple,
-          context, screens: builScreen(), items: [
-            
-          PersistentBottomNavBarItem(
-
-            icon: Icon(MdiIcons.home),
-            title: ("Home"),
-            activeColorPrimary: Colors.blue,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: Icon(MdiIcons.bookOpenPageVariant),
-            title: ("Learn"),
-            activeColorPrimary: Colors.blue,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: Icon(Icons.hub),
-            title: ("Hub"),
-            activeColorPrimary: Colors.blue,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: Icon(MdiIcons.chat),
-            title: ("Chat"),
-            activeColorPrimary: Colors.blue,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: Stack(
-              children: [Icon(Icons.person)]),
-            title: ("Profile"),
-            activeColorPrimary: Colors.blue,
-            inactiveColorPrimary: Colors.grey,
-          ),]
+        body: isLoaded == true
+            ? PersistentTabView(
+                navBarStyle: NavBarStyle.simple,
+                context,
+                screens: builScreen(),
+                items: [
+                    PersistentBottomNavBarItem(
+                      icon: Icon(MdiIcons.home),
+                      title: ("Home"),
+                      activeColorPrimary: Colors.blue,
+                      inactiveColorPrimary: Colors.grey,
+                    ),
+                    PersistentBottomNavBarItem(
+                      icon: Icon(MdiIcons.bookOpenPageVariant),
+                      title: ("Learn"),
+                      activeColorPrimary: Colors.blue,
+                      inactiveColorPrimary: Colors.grey,
+                    ),
+                    PersistentBottomNavBarItem(
+                      icon: const Icon(Icons.hub),
+                      title: ("Hub"),
+                      activeColorPrimary: Colors.blue,
+                      inactiveColorPrimary: Colors.grey,
+                    ),
+                    PersistentBottomNavBarItem(
+                      icon: Icon(MdiIcons.chat),
+                      title: ("Chat"),
+                      activeColorPrimary: Colors.blue,
+                      inactiveColorPrimary: Colors.grey,
+                    ),
+                    PersistentBottomNavBarItem(
+                      icon: Stack(children: [const Icon(Icons.person)]),
+                      title: ("Profile"),
+                      activeColorPrimary: Colors.blue,
+                      inactiveColorPrimary: Colors.grey,
+                    ),
+                  ])
+            : Center(child: CircularProgressIndicator()),
       ),
-    ),);
+    );
   }
 }

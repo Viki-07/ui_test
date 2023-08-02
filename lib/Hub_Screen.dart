@@ -5,6 +5,6 @@ class Hub_Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Hub Screen'),);
+    return const Center(child: Text('Hub Screen'),);
   }
 }

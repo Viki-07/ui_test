@@ -5,6 +5,6 @@ class Learn_Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text('Learn Screen'),);
+    return const Center(child: Text('Learn Screen'),);
   }
 }
